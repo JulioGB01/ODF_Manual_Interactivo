@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ODF — Manual de diseño y etiquetado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#14171a;
+  --panel:#1b2025;
+  --panel-2:#22282e;
+  --line:#2f373f;
+  --line-soft:#252c33;
+  --ink:#dde3e6;
+  --ink-dim:#98a3ab;
+  --ink-faint:#67727a;
+  --copper:#d0812f;      /* +  / fase / equipos */
+  --signal:#5296cc;      /* -  / datos / puertos */
+  --earth:#71a95c;       /* GND / tierra */
+  --fiber:#b071c6;       /* fibra / celdas */
+  --warn:#d4574a;
+  --radius:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+/* faint drafting grid, like the sheet itself */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--line-soft) 1px,transparent 1px),
+    linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:64px 64px;
+  opacity:.35;
+}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 24px 96px}
+
+/* ── header ─────────────────────────────── */
+header{padding:52px 0 28px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--copper);margin-bottom:14px;
+}
+h1{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:clamp(38px,6vw,68px);line-height:.95;letter-spacing:-.01em;
+  text-transform:uppercase;
+}
+h1 .thin{color:var(--ink-faint);font-weight:500}
+.sub{color:var(--ink-dim);margin-top:16px;max-width:60ch;font-size:15px}
+.meta{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+}
+.meta span{
+  border:1px solid var(--line);padding:4px 9px;border-radius:var(--radius);
+  color:var(--ink-faint);
+}
+
+/* ── nav ────────────────────────────────── */
+nav{
+  position:sticky;top:0;z-index:20;background:rgba(20,23,26,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  margin:0 -24px;padding:0 24px;
+}
+.navrow{display:flex;gap:2px;overflow-x:auto;max-width:1180px;margin:0 auto;scrollbar-width:thin}
+.navrow button{
+  background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--ink-faint);cursor:pointer;white-space:nowrap;
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;
+  font-size:15px;letter-spacing:.06em;text-transform:uppercase;
+  padding:15px 14px;transition:color .15s,border-color .15s;
+}
+.navrow button:hover{color:var(--ink)}
+.navrow button.on{color:var(--copper);border-bottom-color:var(--copper)}
+.navrow button:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+
+section{display:none;padding-top:44px}
+section.on{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+h2{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:30px;text-transform:uppercase;letter-spacing:.01em;margin-bottom:6px;
+}
+.lede{color:var(--ink-dim);max-width:70ch;margin-bottom:30px}
+h3{
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:20px;
+  text-transform:uppercase;letter-spacing:.05em;
+  margin:34px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--line);
+}
+h3 .n{color:var(--copper);font-family:'IBM Plex Mono',monospace;font-size:12px;margin-right:9px}
+p{margin-bottom:12px;max-width:78ch}
+code{
+  font-family:'IBM Plex Mono',monospace;font-size:.88em;
+  background:var(--panel-2);border:1px solid var(--line);
+  padding:1px 5px;border-radius:var(--radius);color:var(--copper);
+}
+
+/* ── decoder (signature) ────────────────── */
+.decoder{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px;margin-bottom:26px;
+}
+.dlabel{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;
+}
+#dinput{
+  width:100%;background:var(--ground);border:1px solid var(--line);
+  border-radius:var(--radius);color:var(--copper);
+  font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;
+  padding:15px 16px;
+}
+#dinput:focus{outline:none;border-color:var(--copper)}
+.samples{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.samples button{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+  color:var(--ink-dim);cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;padding:5px 9px;
+}
+.samples button:hover{border-color:var(--copper);color:var(--ink)}
+
+.dout{margin-top:26px}
+.endpoint{
+  border-left:2px solid var(--line);padding-left:16px;margin-bottom:22px;
+}
+.ep-head{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:11px;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.chip{
+  font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;
+  padding:6px 11px;border-radius:var(--radius);border:1px solid;
+}
+.sep{color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;font-size:16px}
+.c-eq{color:var(--copper);border-color:var(--copper);background:rgba(208,129,47,.09)}
+.c-port{color:var(--signal);border-color:var(--signal);background:rgba(82,150,204,.09)}
+.c-pos{color:var(--fiber);border-color:var(--fiber);background:rgba(176,113,198,.09)}
+.c-cell{color:var(--fiber);border-color:var(--fiber);background:rgba(176,113,198,.09)}
+.c-pwr{color:var(--earth);border-color:var(--earth);background:rgba(113,169,92,.09)}
+.c-ref{color:var(--warn);border-color:var(--warn);background:rgba(212,87,74,.09)}
+.c-unk{color:var(--ink-faint);border-color:var(--line);background:var(--panel-2)}
+.legend{list-style:none;font-size:14px}
+.legend li{display:flex;gap:12px;padding:5px 0;border-top:1px solid var(--line-soft)}
+.legend .k{
+  font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:120px;flex-shrink:0;
+}
+.legend .v{color:var(--ink-dim)}
+.verdict{
+  margin-top:16px;padding:12px 14px;border-radius:var(--radius);
+  font-size:14px;border:1px solid;
+}
+.v-ok{border-color:var(--earth);background:rgba(113,169,92,.08);color:var(--earth)}
+.v-bad{border-color:var(--warn);background:rgba(212,87,74,.08);color:var(--warn)}
+.v-ok b,.v-bad b{color:var(--ink)}
+
+/* ── tables ─────────────────────────────── */
+table{width:100%;border-collapse:collapse;margin:14px 0 26px;font-size:14px}
+th{
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);
+  text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);
+}
+td{padding:10px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tbody tr:hover{background:var(--panel)}
+td.mono,th.mono{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--copper);white-space:nowrap}
+td.mono.b{color:var(--signal)}
+td.mono.g{color:var(--earth)}
+td.mono.f{color:var(--fiber)}
+td.dim{color:var(--ink-dim)}
+
+/* ── callouts ───────────────────────────── */
+.note{
+  border-left:2px solid var(--copper);background:var(--panel);
+  padding:14px 18px;margin:18px 0;font-size:14px;color:var(--ink-dim);
+  border-radius:0 var(--radius) var(--radius) 0;
+}
+.note b{color:var(--ink);display:block;margin-bottom:4px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;
+  letter-spacing:.09em;text-transform:uppercase}
+.alert{border-left-color:var(--warn)}
+.alert b{color:var(--warn)}
+
+/* ── ascii diagram ──────────────────────── */
+pre.flow{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px;overflow-x:auto;
+  font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.75;
+  color:var(--ink-dim);margin:16px 0 26px;
+}
+pre.flow b{color:var(--copper);font-weight:600}
+pre.flow i{color:var(--signal);font-style:normal}
+pre.flow u{color:var(--earth);text-decoration:none}
+pre.flow s{color:var(--fiber);text-decoration:none}
+
+/* ── quiz ───────────────────────────────── */
+.quizbar{
+  display:flex;justify-content:space-between;align-items:center;
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 16px;margin-bottom:20px;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);
+}
+.quizbar strong{color:var(--copper);font-weight:600}
+.qcard{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:28px;
+}
+.qnum{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+  color:var(--ink-faint);text-transform:uppercase;margin-bottom:14px;
+}
+.qtext{
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:24px;
+  line-height:1.25;margin-bottom:20px;
+}
+.qtext code{font-size:19px}
+.opts{display:grid;gap:8px}
+.opt{
+  text-align:left;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:var(--radius);color:var(--ink);cursor:pointer;
+  padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;
+  transition:border-color .12s,background .12s;
+}
+.opt:hover:not(:disabled){border-color:var(--copper)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--earth);background:rgba(113,169,92,.12);color:var(--earth)}
+.opt.wrong{border-color:var(--warn);background:rgba(212,87,74,.12);color:var(--warn)}
+.why{
+  margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:14px;color:var(--ink-dim);
+}
+.btn{
+  margin-top:18px;background:var(--copper);border:none;border-radius:var(--radius);
+  color:#14171a;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;
+  letter-spacing:.08em;text-transform:uppercase;padding:11px 22px;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink-dim)}
+.btn.ghost:hover{border-color:var(--copper);color:var(--ink);filter:none}
+
+/* ── grid cards ─────────────────────────── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:16px 0 26px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+}
+.card .tag{
+  font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;
+  color:var(--copper);margin-bottom:6px;
+}
+.card .role{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink);margin-bottom:8px;
+}
+.card .d{font-size:13px;color:var(--ink-dim);line-height:1.55}
+.card .v{
+  margin-top:10px;padding-top:9px;border-top:1px solid var(--line-soft);
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
+}
+@media(max-width:640px){
+  .wrap{padding:0 16px 64px}
+  nav{margin:0 -16px;padding:0 16px}
+  .decoder,.qcard{padding:18px}
+  table{font-size:13px}
+  th,td{padding:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Notas técnicas · Subestaciones</div>
+  <h1>Tablero ODF<br><span class="thin">Etiquetado y sistema eléctrico</span></h1>
+  <p class="sub">Todo lo que hay que saber para dibujar un as-built de ODF: cómo se llama cada equipo, cómo se rotula cada cable, y por dónde corre la energía desde la red de la subestación hasta el SCADA.</p>
+  <div class="meta">
+    <span>Nomenclatura de equipos</span>
+    <span>Etiquetado de cables</span>
+    <span>Sistema de energía</span>
+  </div>
+</header>
+
+<nav>
+  <div class="navrow" id="nav"></div>
+</nav>
+
+<!-- ═══════════ DECODER ═══════════ -->
+<section id="s-decoder" class="on">
+  <h2>Decodificador de etiquetas</h2>
+  <p class="lede">Pegá cualquier etiqueta de un plano y se desarma en sus partes. Es la forma rápida de verificar si un rótulo cumple la norma antes de dibujarlo.</p>
+
+  <div class="decoder">
+    <div class="dlabel">Etiqueta</div>
+    <input id="dinput" spellcheck="false" autocomplete="off" value="SW211.F4.SUP/15C04.A1">
+    <div class="samples" id="samples"></div>
+    <div class="dout" id="dout"></div>
+  </div>
+
+  <h3><span class="n">01</span>Cómo se construye una etiqueta</h3>
+  <p>Toda etiqueta de cable en el ODF sigue el criterio <b>origen / destino</b>. La barra separa los dos extremos del mismo cable. Lo que va antes de la barra es el punto donde está pegada la etiqueta; lo que va después es a dónde llega el otro extremo.</p>
+  <pre class="flow"><b>[EQUIPO].[PUERTO]</b>  /  <i>[EQUIPO_DESTINO].[PUERTO_DESTINO]</i>
+
+Extremo en el switch:   <b>SW210.7</b> / <i>CK231.LAN.IN</i>
+Extremo en el reloj:    <b>CK231.LAN.IN</b> / <i>SW210.7</i>
+
+El mismo cable, rotulado dos veces, invirtiendo el orden.</pre>
+  <div class="note">
+    <b>La regla de oro</b>
+    Si leés la etiqueta parado frente a un equipo, lo primero que aparece es <em>ese</em> equipo. Nunca al revés. Es lo que permite al instalador saber qué tiene en la mano sin abrir el plano.
+  </div>
+</section>
+
+<!-- ═══════════ EQUIPOS ═══════════ -->
+<section id="s-equipos">
+  <h2>Equipos</h2>
+  <p class="lede">Cinco tipos de equipo activo viven dentro del ODF. Cada uno tiene un nombre fijo por norma: prefijo, número, y el código de estación.</p>
+
+  <pre class="flow"><b>[TIPO][NÚMERO]</b>Es<i>[ESTACIÓN]</i>
+
+<b>SW211</b>Es<i>xxxx</i>   →  Switch 3U con IP terminada en .211
+<b>FW240</b>Es<i>xxxx</i>   →  Firewall de la estación
+<b>CK231</b>Es<i>32</i>     →  Reloj GPS de la estación 32</pre>
+
+  <div class="cards" id="eqcards"></div>
+
+  <h3><span class="n">02</span>Por qué los switches 3U tienen esos números</h3>
+  <p>El número del switch <b>no es arbitrario</b>: es el último octeto de su dirección IP en la red de la subestación. Por eso <code>SW211</code> tiene IP <code>x.x.x.211</code>. Y por eso el rango dice de qué lado del bastidor está.</p>
+  <table>
+    <thead><tr><th class="mono">Rango IP</th><th>Lado</th><th>Ejemplos reales en los proyectos</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">.211 – .219</td><td>Lado A</td><td class="dim">SW211, SW212, SW214, SW219</td></tr>
+      <tr><td class="mono">.221 – .230</td><td>Lado B</td><td class="dim">SW221, SW223, SW229, SW230</td></tr>
+    </tbody>
+  </table>
+  <p>Un bastidor típico de un solo piso trae <code>SW211</code> (lado A, izquierda en vista frontal) y <code>SW221</code> (lado B, derecha). Vistos desde atrás izquierda y derecha se invierten.</p>
+
+  <div class="note alert">
+    <b>Errata frecuente en la documentación</b>
+    Algunas especificaciones dan como ejemplo del Switch Central <code>SW240Esxxxx</code>, pero el formato base correcto es <code>SW210Esxxxx</code>. En los planos reales el Switch Central siempre aparece como <b>SW210</b>. El 240 corresponde al Firewall, no al switch central.
+  </div>
+</section>
+
+<!-- ═══════════ CABLES ═══════════ -->
+<section id="s-cables">
+  <h2>Cables y patchcords</h2>
+  <p class="lede">Tres familias de cable, tres reglas de rotulado. Todas comparten el mismo criterio origen/destino.</p>
+
+  <h3><span class="n">03</span>Cables de alimentación</h3>
+  <p>Llevan energía del distribuidor al equipo. Se rotulan en <b>ambos extremos</b> con el nombre del equipo y la tensión, separados por punto.</p>
+  <table>
+    <thead><tr><th class="mono">Extremo en el equipo</th><th class="mono">Extremo en el distribuidor</th><th>Qué alimenta</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">FW240.+12VCC</td><td class="mono b">+12Vcc/FW240.+12VCC</td><td class="dim">Positivo del firewall</td></tr>
+      <tr><td class="mono">FW240.-12VCC</td><td class="mono b">-12Vcc/FW240.-12VCC</td><td class="dim">Negativo del firewall</td></tr>
+      <tr><td class="mono g">FW240.GND</td><td class="mono g">GND/FW240.GND</td><td class="dim">Tierra del firewall</td></tr>
+      <tr><td class="mono">SW211.+24VCC</td><td class="mono b">+24Vcc/SW211.+24VCC</td><td class="dim">Positivo del switch 3U</td></tr>
+      <tr><td class="mono">SW211.-24VCC</td><td class="mono b">-24Vcc/SW211.-24VCC</td><td class="dim">Negativo del switch 3U</td></tr>
+      <tr><td class="mono g">SW211.GND</td><td class="mono g">GND/SW211.GND</td><td class="dim">Tierra del switch 3U</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <b>Único equipo a 12 V</b>
+    El firewall FortiGate Rugged 30D corre a 12 Vcc. Todo lo demás — SW210, los switches 3U, el reloj — va a 24 Vcc. Es el error más fácil de cometer al copiar un plano de otra estación.
+  </div>
+
+  <h3><span class="n">04</span>Patchcords UTP (cobre, entre equipos activos)</h3>
+  <p>Indican <b>equipo y puerto</b> en cada punta.</p>
+  <pre class="flow">Extremo en el Switch Central:  <b>SW210.1X</b> / <i>FW240.P5</i>
+Extremo en el Firewall:        <b>FW240.P5</b> / <i>SW210.1X</i></pre>
+  <table>
+    <thead><tr><th class="mono">Etiqueta en planos</th><th>Qué une</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">SW210.4 / FW240.LAN3</td><td class="dim">Puerto 4 del switch central → LAN3 del firewall (red interna del ODF)</td></tr>
+      <tr><td class="mono">SW210.7 / CK231.LAN.IN</td><td class="dim">Puerto 7 → entrada LAN del reloj GPS</td></tr>
+      <tr><td class="mono">FW240.LAN4 / SW.TC.P18</td><td class="dim">LAN4 del firewall → puerto 18 del switch del Tablero TC (salida al SCADA)</td></tr>
+      <tr><td class="mono">SW211.P1 / SW214.P2</td><td class="dim">Uplink entre dos switches 3U</td></tr>
+      <tr><td class="mono">CK231.POE.OUT / GPS</td><td class="dim">Salida POE del reloj → antena GPS en el techo</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">05</span>Patchcords de fibra OM2 LC (casete ↔ switch 3U)</h3>
+  <p>Mismo criterio, pero hay que agregar la <b>posición física</b> del conector para poder distinguir las dos fibras de cada canal.</p>
+  <pre class="flow">Lado del casete:  <s>15C04.A1</s> / <b>SW211.F4.SUP</b>
+Lado del switch:  <b>SW211.F4.SUP</b> / <s>15C04.A1</s>
+
+En el switch:  <i>SUP</i> = conector superior   <i>INF</i> = conector inferior
+En el casete:  <s>A1 A2</s> = lado A    <s>R3 R4</s> = reserva    <s>B5 B6</s> = lado B</pre>
+  <table>
+    <thead><tr><th class="mono">Posición</th><th>Dónde está</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td class="mono f">A1 / A2</td><td class="dim">Fila superior del casete, lado A</td><td class="dim">Par de fibras del canal A</td></tr>
+      <tr><td class="mono">R3 / R4</td><td class="dim">Centro del casete</td><td class="dim">Reserva — no se conecta</td></tr>
+      <tr><td class="mono f">B5 / B6</td><td class="dim">Fila inferior del casete, lado B</td><td class="dim">Par de fibras del canal B</td></tr>
+      <tr><td class="mono b">SUP</td><td class="dim">Conector de arriba del puerto Fxx</td><td class="dim">Una fibra del par dúplex</td></tr>
+      <tr><td class="mono b">INF</td><td class="dim">Conector de abajo del puerto Fxx</td><td class="dim">La otra fibra del par</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">06</span>Jumper de fibra</h3>
+  <p>El jumper que va del casete a la celda lleva simplemente el <b>identificador de la celda</b>, igual que el acrílico del casete. Sin puertos ni lados — no hay ambigüedad posible porque une un solo casete con una sola celda.</p>
+</section>
+
+<!-- ═══════════ CELDAS ═══════════ -->
+<section id="s-celdas">
+  <h2>Celdas y casetes</h2>
+  <p class="lede">Cada casete del ODF corresponde a una celda de media tensión del campo. Su identificador es tensión + número de celda.</p>
+
+  <pre class="flow">Acrílico físico del casete:   <s>30/C01</s>     ← con barra
+Etiqueta en patchcord:        <s>30C01</s>.A1   ← sin barra
+
+<s>30/C01</s>  →  Celda 01 de 30 kV
+<s>15/C04</s>  →  Celda 04 de 15 kV
+<s>10/C04</s>  →  Celda 04 de 10 kV</pre>
+
+  <div class="note alert">
+    <b>Conflicto abierto — consultar con Agustin</b>
+    Algunos planos nombran los cables de fibra como <code>15.04</code>, con punto. La norma de etiquetado dice que el casete se etiqueta <code>15/C04</code> y el patchcord <code>15C04</code>. Las dos formas conviven en distintos sets de planos. Antes de rehacer una hoja de bastidor conviene confirmar cuál rige en ese proyecto puntual.
+  </div>
+
+  <h3><span class="n">07</span>Cómo cablea un casete a un switch</h3>
+  <p>Un casete agrupa varias celdas. Cada celda usa un puerto <code>Fxx</code> del switch 3U, y cada puerto son dos fibras: SUP e INF.</p>
+  <table>
+    <thead><tr><th class="mono">Etiqueta completa</th><th>Lectura</th></tr></thead>
+    <tbody>
+      <tr><td class="mono f">15C04.A1 / SW211.F4.INF</td><td class="dim">Primera fibra de la celda 15.04, lado A posición 1 → puerto F4 inferior del SW211</td></tr>
+      <tr><td class="mono f">15C04.A2 / SW211.F4.SUP</td><td class="dim">Segunda fibra de la misma celda → puerto F4 superior del mismo switch</td></tr>
+      <tr><td class="mono f">15C03.B5 / SW221.F3.INF</td><td class="dim">Celda 15.03 lado B → puerto F3 inferior del SW221 (el switch del lado B)</td></tr>
+      <tr><td class="mono f">15C03.B6 / SW221.F3.SUP</td><td class="dim">Segunda fibra del mismo canal B</td></tr>
+    </tbody>
+  </table>
+  <p>Los switches 3U tienen <b>8 puertos de fibra</b> (F1 a F8), o sea 8 celdas por switch. Si la estación tiene más celdas, se agrega otro switch 3U y se le da la IP siguiente.</p>
+</section>
+
+<!-- ═══════════ ENERGÍA ═══════════ -->
+<section id="s-energia">
+  <h2>Sistema de energía</h2>
+  <p class="lede">Desde la red de la subestación hasta los bornes de cada equipo. Dos sistemas en paralelo: alterna para alimentar los conversores, continua para alimentar todo lo demás.</p>
+
+  <pre class="flow"><i>RED DE LA SUBESTACIÓN</i>  220 Vac  /  110 Vdc
+       │
+       ▼
+<i>PANEL SS.AA.AC  ·  SS.AA.CC</i>          externos al ODF
+       │
+       ▼
+<b>BREAKER Q220</b>  40A                    protege la alterna del tablero
+       │
+       ▼
+<b>CONVERSOR C24</b>  110/24V               ← acá nace la corriente continua
+       │
+       ▼
+<b>BREAKER Q24</b>  10A                     protege el bus de continua
+       │
+       ▼
+<u>BUS  +24VCC · -24VCC · GND</u>           bornera central del ODF
+       │
+       ├──▶ <b>SW210</b>   switch central, hub de toda la red
+       ├──▶ <b>SW211</b>   switch 3U lado A  ──▶ <s>celdas por fibra</s>
+       ├──▶ <b>SW221</b>   switch 3U lado B  ──▶ <s>celdas por fibra</s>
+       ├──▶ <b>CK231</b>   reloj GPS         ──▶ antena en el techo (POE)
+       └──▶ <b>FW240</b>   firewall  <i>(12 Vcc)</i> ──▶ Tablero TC ──▶ <i>SCADA</i></pre>
+
+  <h3><span class="n">08</span>Buses del distribuidor</h3>
+  <table>
+    <thead><tr><th class="mono">Bus</th><th>Qué alimenta</th><th>Acrílico</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">220VAC / 230Vac</td><td class="dim">Conversor C24 y el PDU</td><td class="mono">230Vac</td></tr>
+      <tr><td class="mono">+24VCC</td><td class="dim">SW210, SW211, SW221, CK231 y todos los switches 3U</td><td class="mono">+24VCC</td></tr>
+      <tr><td class="mono b">-24VCC</td><td class="dim">Retorno de todos los equipos a 24 V</td><td class="mono">- 24VCC</td></tr>
+      <tr><td class="mono">+12VCC</td><td class="dim">Solo el firewall FW240</td><td class="mono">+12VCC</td></tr>
+      <tr><td class="mono b">-12VCC</td><td class="dim">Retorno del firewall</td><td class="mono">- 12VCC</td></tr>
+      <tr><td class="mono g">GND</td><td class="dim">Tierra de todos los equipos</td><td class="mono">GND</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">09</span>Protecciones</h3>
+  <table>
+    <thead><tr><th class="mono">Breaker</th><th>Protege</th><th>Aparece en</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Q220</td><td class="dim">Entrada de alterna 220 Vac al tablero — 40 A</td><td class="dim">Hoja de auxiliares</td></tr>
+      <tr><td class="mono">Q24</td><td class="dim">Bus de continua 24 Vcc — 10 A</td><td class="dim">Hoja de cableado</td></tr>
+      <tr><td class="mono">QA24</td><td class="dim">Entrada del conversor A</td><td class="dim">Bifilar CC</td></tr>
+      <tr><td class="mono">QB24</td><td class="dim">Entrada del conversor B (solo si hay redundancia)</td><td class="dim">Bifilar CC — configuración redundante</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">10</span>La señal TL.CC.ALO</h3>
+  <p>No es fibra ni Ethernet: es un circuito de <b>telealimentación de corriente continua</b> que sale del ODF hacia el campo.</p>
+  <pre class="flow"><b>TL</b>   Telealimentación
+<b>CC</b>   Corriente Continua
+<b>ALO</b>  nombre del circuito de alimentación local
+<b>FA24</b> Feed A, 24 Vcc
+<b>FB24</b> Feed B, 24 Vcc — solo donde hay conversor redundante</pre>
+  <p>Es fácil que estos cables terminen con una referencia cruzada rota (por ejemplo <code>H7:B2</code>) cuando se adapta un plano maestro más grande a un set más chico: la hoja referenciada puede no existir o no contener ese circuito en el set nuevo. Hay que verificarlo siempre.</p>
+</section>
+
+<!-- ═══════════ ESTACIONES ═══════════ -->
+<section id="s-estaciones">
+  <h2>Configuraciones típicas</h2>
+  <p class="lede">Un mismo diseño de ODF se adapta a estaciones distintas. Conocer qué suele variar evita arrastrar errores al reutilizar un plano de otra estación como base.</p>
+
+  <table>
+    <thead><tr><th>Característica</th><th class="mono">Configuración simple</th><th class="mono">Configuración redundante</th></tr></thead>
+    <tbody>
+      <tr><td class="dim">Tensión de campo</td><td class="mono">una sola (p. ej. 10 kV)</td><td class="mono">puede combinar niveles (p. ej. 15 kV)</td></tr>
+      <tr><td class="dim">Conversores CC</td><td class="mono">1 × C24</td><td class="mono">2 × C24A + C24B</td></tr>
+      <tr><td class="dim">Breakers CC</td><td class="mono">QA24</td><td class="mono">QA24 + QB24</td></tr>
+      <tr><td class="dim">Switches 3U</td><td class="mono">2 (uno por lado)</td><td class="mono">varios pares, según cantidad de celdas</td></tr>
+      <tr><td class="dim">Bastidores</td><td class="mono">1 (ODF de pared)</td><td class="mono">varios (ODF de piso)</td></tr>
+      <tr><td class="dim">Telealimentación</td><td class="mono">FA24</td><td class="mono">FA24 + FB24</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>De dónde vienen los errores</b>
+    Cuando se adapta un plano maestro más grande y redundante a una estación más chica y simple, suelen sobrar hojas, sobrar conversores y sobrar referencias cruzadas que apuntan a hojas que ya no están en el set nuevo. Conviene barrer todo eso antes de dar el plano por terminado.
+  </div>
+
+  <h3><span class="n">11</span>ODF de piso vs ODF de pared</h3>
+  <p>En el <b>ODF de piso</b> los bastidores van apilados en pisos horizontales. En el <b>ODF de pared</b> —un gabinete típico de 600×300×1400— los bastidores van en vertical. La diferencia importa porque cambia cómo se dibujan las vistas frontal y posterior.</p>
+  <p>Un ODF de pared con un <b>único bastidor</b> suele traer un solo par de switches (211 y 221). Visto de atrás la disposición se espeja: el que estaba a la derecha en vista frontal pasa a la izquierda.</p>
+</section>
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<section id="s-quiz">
+  <h2>Práctica</h2>
+  <p class="lede">Doce preguntas sobre lo que más se equivoca al dibujar estos planos. Sin trampa: si fallás, te dice por qué.</p>
+
+  <div class="quizbar">
+    <span>Progreso <strong id="qprog">0 / 12</strong></span>
+    <span>Correctas <strong id="qscore">0</strong></span>
+  </div>
+  <div id="qzone"></div>
+</section>
+
+</div>
+
+<script>
+/* ═══════════════ DATA ═══════════════ */
+
+const SECTIONS = [
+  ['s-decoder',   'Decodificador'],
+  ['s-equipos',   'Equipos'],
+  ['s-cables',    'Cables'],
+  ['s-celdas',    'Celdas y casetes'],
+  ['s-energia',   'Energía'],
+  ['s-estaciones','Estaciones'],
+  ['s-quiz',      'Práctica'],
+];
+
+const EQUIPOS = [
+  { tag:'SW210', role:'Switch Central', d:'Red Box. Es el hub de toda la red del ODF. Conecta hasta 16 celdas y concentra el tráfico de todos los switches 3U.', v:'SW210Esxxxx · 24 Vcc' },
+  { tag:'SWyyy', role:'Switch 3U (Eurocard)', d:'Conecta las celdas de media tensión por fibra óptica. 8 puertos F1–F8. El número yyy es el último octeto de su IP.', v:'SWyyyEsxxxx · 24 Vcc' },
+  { tag:'FW240', role:'Firewall', d:'FortiGate Rugged 30D. Separa la red interna del ODF de la red corporativa. LAN3 hacia adentro, LAN4 hacia el Tablero TC.', v:'FW240Esxxxx · 12 Vcc' },
+  { tag:'CK231', role:'Reloj GPS', d:'Sincroniza el tiempo de todos los equipos de protección. Alimenta la antena GPS del techo por su salida POE.', v:'CK231Esxxxx · 24 Vcc' },
+  { tag:'C24',   role:'Conversor', d:'Transforma la alterna de la subestación en 24 Vcc y 12 Vcc. En estaciones críticas hay dos (C24A y C24B) para redundancia.', v:'110/24V · AC → CC' },
+  { tag:'Casete 3U', role:'Casete de fibra', d:'Aloja los conectores LC de una o varias celdas. Lleva un acrílico al frente con la celda a la que se conecta.', v:'30/C01 · 15/C04' },
+];
+
+/* Decoder token rules — order matters */
+const RULES = [
+  { re:/^SW(\d{3})$/i, cls:'c-eq', kind:'Equipo',
+    fn:m=>{ const n=+m[1];
+      if(n===210) return 'Switch Central (Red Box). Hub de toda la red del ODF.';
+      const lado = (n>=221) ? 'lado B' : 'lado A';
+      return 'Switch 3U Eurocard, '+lado+'. Su IP termina en .'+m[1]+'.';
+    }},
+  { re:/^SW(\d{3})(?:Es|ES|E)(\w+)$/i, cls:'c-eq', kind:'Equipo + estación',
+    fn:m=>{ const n=+m[1];
+      const rol = n===210 ? 'Switch Central' : 'Switch 3U (IP .'+m[1]+', '+(n>=221?'lado B':'lado A')+')';
+      return rol+' de la estación '+m[2]+'.';
+    }},
+  { re:/^FW(\d{3})(?:(?:Es|ES|E)(\w+))?$/i, cls:'c-eq', kind:'Equipo',
+    fn:m=>'Firewall FortiGate Rugged 30D'+(m[2]?' de la estación '+m[2]:'')+'. Único equipo a 12 Vcc.' },
+  { re:/^CK(\d{3})(?:(?:Es|ES|E)(\w+))?$/i, cls:'c-eq', kind:'Equipo',
+    fn:m=>'Reloj GPS'+(m[2]?' de la estación '+m[2]:'')+'. Sincroniza el tiempo de la red de protección.' },
+  { re:/^C24[AB]?$/i, cls:'c-eq', kind:'Equipo',
+    fn:m=>'Conversor de tensión 110/24 V. Genera la corriente continua del tablero.' },
+  { re:/^Q(220|24|A24|B24)$/i, cls:'c-eq', kind:'Protección',
+    fn:m=>({'220':'Breaker de la alterna 220 Vac — 40 A.','24':'Breaker del bus de continua 24 Vcc — 10 A.',
+            'A24':'Breaker de entrada del conversor A.','B24':'Breaker de entrada del conversor B.'}[m[1]]) },
+  { re:/^H(\d+):([A-D]?\d[A-D]?)$/i, cls:'c-ref', kind:'Referencia cruzada',
+    fn:m=>'El cable continúa en la hoja '+m[1]+', cuadrante '+m[2].toUpperCase()+'. Verificar que esa hoja exista en el set.' },
+
+  { re:/^F(\d{1,2})$/i, cls:'c-port', kind:'Puerto de fibra',
+    fn:m=>'Puerto de fibra F'+(+m[1])+' del switch 3U. Cada switch tiene 8 (F1–F8): una celda por puerto.' },
+  { re:/^(SUP|INF)$/i, cls:'c-port', kind:'Conector',
+    fn:m=>m[1].toUpperCase()==='SUP' ? 'Conector superior del par dúplex LC.' : 'Conector inferior del par dúplex LC.' },
+  { re:/^P(\d{1,2})$/i, cls:'c-port', kind:'Puerto uplink',
+    fn:m=>'Puerto de uplink P'+(+m[1])+'. Los switches 3U usan P1 y P2 para encadenarse entre sí.' },
+  { re:/^LAN(\d)?$/i, cls:'c-port', kind:'Puerto LAN',
+    fn:m=>m[1] ? ('Puerto LAN'+m[1]+' del firewall. LAN3 = red interna del ODF, LAN4 = salida al Tablero TC.') : 'Puerto LAN.' },
+  { re:/^IN$/i, cls:'c-port', kind:'Puerto', fn:()=>'Entrada. Se usa en CK231.LAN.IN — la entrada de red del reloj.' },
+  { re:/^POE$/i, cls:'c-port', kind:'Puerto', fn:()=>'Power over Ethernet. El reloj alimenta la antena GPS por acá.' },
+  { re:/^OUT$/i, cls:'c-port', kind:'Puerto', fn:()=>'Salida. Se usa en CK231.POE.OUT — la salida hacia la antena.' },
+  { re:/^GPS$/i, cls:'c-eq', kind:'Equipo', fn:()=>'Antena GPS, montada en el techo de la estación.' },
+  { re:/^(\d{1,2}X)$/i, cls:'c-port', kind:'Puerto',
+    fn:m=>'Puerto '+m[1].toUpperCase()+' del switch central.' },
+  { re:/^\d{1,2}$/, cls:'c-port', kind:'Puerto',
+    fn:m=>'Puerto número '+m[0]+' del equipo anterior.' },
+
+  { re:/^([AB])[_]?([12456])$/i, cls:'c-pos', kind:'Posición en casete',
+    fn:m=>'Lado '+m[1].toUpperCase()+', posición '+m[2]+' del casete. Una de las dos fibras del canal '+m[1].toUpperCase()+'.' },
+  { re:/^R[34]$/i, cls:'c-pos', kind:'Posición en casete',
+    fn:()=>'Posición de reserva del casete. No se conecta.' },
+  { re:/^(\d{1,3})C(\d{2})$/i, cls:'c-cell', kind:'Celda',
+    fn:m=>'Celda '+(+m[2])+' de '+m[1]+' kV. En el acrílico del casete va como '+m[1]+'/C'+m[2]+'.' },
+  { re:/^(\d{1,3})\.(\d{2})$/, cls:'c-cell', kind:'Celda (forma antigua)',
+    fn:m=>'Celda '+(+m[2])+' de '+m[1]+' kV, escrita a la vieja usanza. La norma pide '+m[1]+'C'+m[2]+'.' },
+
+  { re:/^([+-])(24|12)V(?:CC|DC)$/i, cls:'c-pwr', kind:'Bus de continua',
+    fn:m=>'Bus '+(m[1]==='+'?'positivo':'negativo')+' de '+m[2]+' Vcc.'+(m[2]==='12'?' Solo alimenta el firewall.':'') },
+  { re:/^GND$/i, cls:'c-pwr', kind:'Tierra', fn:()=>'Bus de tierra. Todos los equipos conectan su GND acá.' },
+  { re:/^2[23]0V(?:AC|CA)$/i, cls:'c-pwr', kind:'Bus de alterna',
+    fn:()=>'Bus de corriente alterna. Alimenta el conversor y el PDU.' },
+  { re:/^[+-]$/, cls:'c-pwr', kind:'Polaridad',
+    fn:m=>'Borne '+(m[0]==='+'?'positivo':'negativo')+' del equipo.' },
+  { re:/^(F|N|L|T|S)$/i, cls:'c-pwr', kind:'Terminal AC',
+    fn:m=>({F:'Fase.',N:'Neutro.',L:'Línea (fase).',T:'Polo T de la alimentación trifásica.',S:'Polo S de la alimentación trifásica.'}[m[1].toUpperCase()]) },
+  { re:/^TL$/i, cls:'c-pwr', kind:'Circuito', fn:()=>'Telealimentación — circuito de alimentación remota al campo.' },
+  { re:/^CC$/i, cls:'c-pwr', kind:'Circuito', fn:()=>'Corriente Continua.' },
+  { re:/^ALO$/i, cls:'c-pwr', kind:'Circuito', fn:()=>'Nombre del circuito de alimentación local.' },
+  { re:/^F[AB]24$/i, cls:'c-pwr', kind:'Feed',
+    fn:m=>'Feed '+m[0][1].toUpperCase()+' de 24 Vcc. El feed B solo existe donde hay conversor redundante.' },
+  { re:/^RTU\d*$/i, cls:'c-eq', kind:'Equipo',
+    fn:()=>'Remote Terminal Unit. Adquiere señales de los relés de protección del campo.' },
+  { re:/^SW\.TC$/i, cls:'c-eq', kind:'Equipo',
+    fn:()=>'Switch del Tablero de Comunicaciones. Está fuera del ODF — es la salida hacia el SCADA.' },
+];
+
+const SAMPLES = [
+  'SW211.F4.SUP/15C04.A1',
+  'SW210.4/FW240.LAN3',
+  'CK231.POE.OUT/GPS',
+  '+24Vcc/SW211.+24VCC',
+  'FW240.LAN4/SW.TC.P18',
+  'SW221.F3.INF/15C03.B5',
+  'H7:B2',
+  'SW211.F4.SUP/60.04.A2',
+];
+
+const QUIZ = [
+  { q:'¿Qué tensión usa el firewall FW240?',
+    o:['24 Vcc, como todo el resto','12 Vcc','220 Vac directo','48 Vcc por POE'], a:1,
+    why:'El FortiGate Rugged 30D es el único equipo del ODF que corre a 12 Vcc. Todos los demás — SW210, los switches 3U, el reloj — van a 24 Vcc. Por eso el distribuidor tiene un bus +12VCC y -12VCC aparte.' },
+
+  { q:'En <code>SW223Esxxxx</code>, ¿qué significa el 223?',
+    o:['El modelo del switch','El número de celda que conecta','El último octeto de su dirección IP','La cantidad de puertos'], a:2,
+    why:'La norma dice SWyyyEsxxxx donde yyy es el último octeto de la IP del switch. Como 223 está en el rango 221–230, además sabemos que es un switch del lado B del bastidor.' },
+
+  { q:'El cable entre el Switch Central y el Firewall. ¿Cómo se rotula el extremo que va enchufado al Firewall?',
+    o:['SW210.4 / FW240.LAN3','FW240.LAN3 / SW210.4','FW240 / SW210','LAN3 / Puerto 4'], a:1,
+    why:'Criterio origen/destino: parado frente al equipo, lo primero que se lee es ese equipo. En el extremo del firewall arranca con FW240; en el extremo del switch arranca con SW210. El mismo cable, dos etiquetas espejadas.' },
+
+  { q:'¿Qué es <code>15C04</code>?',
+    o:['El switch 4 de la estación 15','La celda 04 de 15 kV','El casete 15, puerto 4','El cable 15 metros, canal 4'], a:1,
+    why:'Tensión + número de celda. En el acrílico físico del casete se escribe con barra (15/C04) y en la etiqueta del patchcord sin barra (15C04). Los planos viejos lo escriben 15.04.' },
+
+  { q:'En <code>SW211.F4.SUP</code>, ¿qué es SUP?',
+    o:['El bastidor superior del ODF','El conector superior del par dúplex LC','Un switch de respaldo','La celda superior del campo'], a:1,
+    why:'Cada puerto de fibra Fxx tiene dos conectores: SUP (arriba) e INF (abajo). Son las dos fibras del par dúplex. Sin ese dato no se puede distinguir un patchcord del otro en el plano.' },
+
+  { q:'¿Cuántas celdas puede atender un switch 3U?',
+    o:['4','8','16','Depende de la estación'], a:1,
+    why:'Ocho: los puertos F1 a F8, una celda por puerto. Si la estación tiene más celdas, se agrega otro switch 3U con la IP siguiente. Una estación chica puede tener solo dos switches (un par); una grande y redundante puede tener seis o más.' },
+
+  { q:'Encontrás la etiqueta <code>H7:B2</code> en la hoja 6 de un set de 14 hojas. ¿Qué hacés?',
+    o:['Nada, es válida: la hoja 7 existe','Verificar que el cable realmente termine en la hoja 7 cuadrante B2','Cambiarla a H6:B2','Borrarla siempre'], a:1,
+    why:'Que la hoja exista no alcanza. La referencia es válida solo si el otro extremo del cable está realmente ahí y la hoja destino tiene la etiqueta apuntando de vuelta. Si la hoja 7 de ese set en particular no contiene el circuito, la referencia hay que borrarla o corregirla.' },
+
+  { q:'¿Qué protege el breaker Q24?',
+    o:['La entrada de alterna al tablero','El bus de corriente continua de 24 Vcc','El firewall','La antena GPS'], a:1,
+    why:'Q220 protege la alterna (40 A); Q24 protege el bus de continua que sale del conversor (10 A). QA24 y QB24 protegen la entrada de cada conversor.' },
+
+  { q:'¿A dónde va el puerto LAN4 del firewall?',
+    o:['Al Switch Central SW210','Al reloj GPS','Al Switch del Tablero TC — la salida al SCADA','A las celdas por fibra'], a:2,
+    why:'El firewall tiene una pata adentro y una afuera. LAN3 va al SW210 (red interna del ODF). LAN4 va al puerto 18 del switch del Tablero de Comunicaciones, que es por donde la subestación se conecta al sistema de monitoreo remoto.' },
+
+  { q:'En la vista posterior de bastidores, ¿de qué lado aparece el SW221?',
+    o:['A la izquierda','A la derecha','En el centro','No aparece en vista posterior'], a:0,
+    why:'Truco clásico. En vista frontal el SW211 (lado A) está a la izquierda y el SW221 (lado B) a la derecha. Vistos desde atrás la imagen se espeja: el 221 pasa a la izquierda. Es uno de los errores más comunes al dibujar la hoja de conexión de red.' },
+
+  { q:'¿Qué significa <code>TL.CC.ALO.FA24</code>?',
+    o:['Un cable de fibra a la celda 24','Telealimentación de corriente continua, feed A de 24 Vcc','Un puerto del switch 3U','El conversor A del tablero'], a:1,
+    why:'TL = Telealimentación, CC = Corriente Continua, ALO = nombre del circuito de alimentación local, FA24 = Feed A de 24 Vcc. Es alimentación que sale del ODF hacia el campo, no datos.' },
+
+  { q:'Estás adaptando un plano maestro más grande y redundante a una estación más chica. ¿Cuál es el riesgo principal?',
+    o:['Que falten capas en el DWG','Que queden referencias cruzadas y equipos que en la estación nueva no existen','Que no se pueda plotear','Que cambien las escalas'], a:1,
+    why:'Es la causa más común de errores en revisión: hojas del maestro que no están en el set nuevo, un segundo conversor que no existe, switches con el número equivocado. Al adaptar hay que barrer todo lo que sobró.' },
+];
+
+/* ═══════════════ NAV ═══════════════ */
+const nav = document.getElementById('nav');
+SECTIONS.forEach(([id,label],i)=>{
+  const b=document.createElement('button');
+  b.textContent=label; b.dataset.target=id;
+  if(i===0) b.classList.add('on');
+  b.onclick=()=>{
+    document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById(id).classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  nav.appendChild(b);
+});
+
+/* ═══════════════ EQUIPO CARDS ═══════════════ */
+document.getElementById('eqcards').innerHTML = EQUIPOS.map(e=>`
+  <div class="card">
+    <div class="tag">${e.tag}</div>
+    <div class="role">${e.role}</div>
+    <div class="d">${e.d}</div>
+    <div class="v">${e.v}</div>
+  </div>`).join('');
+
+/* ═══════════════ DECODER ═══════════════ */
+const input = document.getElementById('dinput');
+const dout  = document.getElementById('dout');
+
+document.getElementById('samples').innerHTML =
+  SAMPLES.map(s=>`<button data-s="${s}">${s}</button>`).join('');
+document.getElementById('samples').onclick = e=>{
+  if(e.target.dataset.s){ input.value = e.target.dataset.s; decode(); }
+};
+
+function classify(tok){
+  for(const r of RULES){
+    const m = tok.match(r.re);
+    if(m) return { tok, cls:r.cls, kind:r.kind, desc:r.fn(m) };
+  }
+  return { tok, cls:'c-unk', kind:'Sin reconocer', desc:'No coincide con ninguna regla de la norma. Puede ser un error de tipeo o un identificador propio de la estación.' };
+}
+
+function esc(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function decode(){
+  const raw = input.value.trim();
+  if(!raw){ dout.innerHTML=''; return; }
+
+  const parts = raw.split('/').map(s=>s.trim()).filter(Boolean);
+  let html = '';
+  let allKnown = true;
+  const seenCell = [];
+
+  parts.forEach((part,pi)=>{
+    // split on dots, but keep +24VCC / -24VCC style tokens intact
+    const toks = part.split('.').map(t=>t.trim()).filter(Boolean);
+    const parsed = toks.map(classify);
+    parsed.forEach(p=>{
+      if(p.cls==='c-unk') allKnown=false;
+      if(p.kind.startsWith('Celda')) seenCell.push(p);
+    });
+
+    const chips = parsed.map((p,i)=>
+      (i? '<span class="sep">.</span>':'') +
+      `<span class="chip ${p.cls}">${esc(p.tok)}</span>`
+    ).join('');
+
+    const legend = parsed.map(p=>
+      `<li><span class="k ${p.cls.replace('c-','t-')}">${esc(p.tok)}</span>
+           <span class="v"><b style="color:var(--ink)">${p.kind}.</b> ${p.desc}</span></li>`
+    ).join('');
+
+    const head = parts.length>1
+      ? (pi===0 ? 'Extremo donde está pegada la etiqueta — origen'
+                : 'Otro extremo del cable — destino')
+      : 'Identificador';
+
+    html += `<div class="endpoint">
+      <div class="ep-head">${head}</div>
+      <div class="chips">${chips}</div>
+      <ul class="legend">${legend}</ul>
+    </div>`;
+  });
+
+  // verdict
+  let v='', vc='v-ok';
+  const oldCell = seenCell.find(c=>c.kind.includes('antigua'));
+  if(oldCell){
+    vc='v-bad';
+    v = `<b>Forma antigua.</b> El identificador de celda <code>${esc(oldCell.tok)}</code> usa punto. La norma 4.5 pide la forma sin punto (${esc(oldCell.tok.replace('.','C'))}). Confirmar con el cliente qué forma rige en los planos antes de cambiarlo en masa.`;
+  } else if(!allKnown){
+    vc='v-bad';
+    v = `<b>Hay tokens sin reconocer.</b> Revisá los marcados en gris: o son un error de tipeo, o son identificadores propios de esta estación que no están en la norma.`;
+  } else if(parts.length===1 && !raw.match(/^H\d+:/i)){
+    v = `<b>Identificador válido.</b> Si esto es un cable y no un equipo, le falta el otro extremo: la norma pide el formato origen/destino con barra.`;
+    vc='v-bad';
+  } else if(parts.length>=2){
+    v = `<b>Etiqueta bien formada.</b> Cumple el criterio origen/destino. Acordate de rotular el otro extremo del cable con el orden invertido: <code>${esc(parts.slice().reverse().join(' / '))}</code>`;
+  } else {
+    v = `<b>Referencia cruzada.</b> Antes de darla por buena, verificá que la hoja exista en este set y que el cable realmente termine en ese cuadrante.`;
+  }
+  html += `<div class="verdict ${vc}">${v}</div>`;
+
+  dout.innerHTML = html;
+}
+
+input.addEventListener('input', decode);
+decode();
+
+/* ═══════════════ QUIZ ═══════════════ */
+let qi = 0, score = 0, answered = false;
+const qzone  = document.getElementById('qzone');
+const qprog  = document.getElementById('qprog');
+const qscore = document.getElementById('qscore');
+
+function renderQ(){
+  if(qi >= QUIZ.length){
+    const pct = Math.round(score/QUIZ.length*100);
+    let verdict;
+    if(pct===100)      verdict = 'Sin errores. Podés dibujar estos planos sin mirar la norma.';
+    else if(pct>=75)   verdict = 'Sólido. Repasá las que fallaste y ya está.';
+    else if(pct>=50)   verdict = 'Vas bien pero todavía se te escapan cosas que el cliente va a marcar en revisión.';
+    else               verdict = 'Volvé a las secciones de Cables y Celdas antes de tocar el DWG.';
+    qzone.innerHTML = `
+      <div class="qcard">
+        <div class="qnum">Resultado</div>
+        <div class="qtext">${score} de ${QUIZ.length} correctas — ${pct}%</div>
+        <p style="color:var(--ink-dim)">${verdict}</p>
+        <button class="btn" id="again">Empezar de nuevo</button>
+      </div>`;
+    document.getElementById('again').onclick = ()=>{ qi=0; score=0; update(); renderQ(); };
+    return;
+  }
+
+  const q = QUIZ[qi];
+  answered = false;
+  qzone.innerHTML = `
+    <div class="qcard">
+      <div class="qnum">Pregunta ${qi+1} de ${QUIZ.length}</div>
+      <div class="qtext">${q.q}</div>
+      <div class="opts">
+        ${q.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}
+      </div>
+      <div id="why"></div>
+    </div>`;
+
+  qzone.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(answered) return;
+      answered = true;
+      const pick = +btn.dataset.i;
+      const opts = qzone.querySelectorAll('.opt');
+      opts.forEach((b,i)=>{
+        b.disabled = true;
+        if(i === q.a) b.classList.add('right');
+        else if(i === pick) b.classList.add('wrong');
+      });
+      if(pick === q.a) score++;
+      update();
+      document.getElementById('why').innerHTML =
+        `<div class="why">${q.why}</div>
+         <button class="btn" id="next">${qi === QUIZ.length-1 ? 'Ver resultado' : 'Siguiente'}</button>`;
+      document.getElementById('next').onclick = ()=>{ qi++; update(); renderQ(); };
+    };
+  });
+}
+function update(){
+  qprog.textContent  = `${Math.min(qi, QUIZ.length)} / ${QUIZ.length}`;
+  qscore.textContent = score;
+}
+update();
+renderQ();
+</script>
+</body>
+</html>

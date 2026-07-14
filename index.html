@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Manual interactivo de diseño y etiquetado del Tablero ODF: nomenclatura de equipos, rotulado de cables y sistema de energía para subestaciones eléctricas.">
+<title>ODF — Manual de diseño y etiquetado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Notas técnicas · Subestaciones</div>
+  <h1>Tablero ODF<br><span class="thin">Etiquetado y sistema eléctrico</span></h1>
+  <p class="sub">Todo lo que hay que saber para dibujar un as-built de ODF: cómo se llama cada equipo, cómo se rotula cada cable, y por dónde corre la energía desde la red de la subestación hasta el SCADA.</p>
+  <div class="meta">
+    <span>Nomenclatura de equipos</span>
+    <span>Etiquetado de cables</span>
+    <span>Sistema de energía</span>
+  </div>
+</header>
+
+<nav>
+  <div class="navrow" id="nav"></div>
+</nav>
+
+<!-- ═══════════ DECODER ═══════════ -->
+<section id="s-decoder" class="on">
+  <h2>Decodificador de etiquetas</h2>
+  <p class="lede">Pegá cualquier etiqueta de un plano y se desarma en sus partes. Es la forma rápida de verificar si un rótulo cumple la norma antes de dibujarlo.</p>
+
+  <div class="decoder">
+    <div class="dlabel">Etiqueta</div>
+    <input id="dinput" spellcheck="false" autocomplete="off" value="SW211.F4.SUP/15C04.A1">
+    <div class="samples" id="samples"></div>
+    <div class="dout" id="dout"></div>
+  </div>
+
+  <h3><span class="n">01</span>Cómo se construye una etiqueta</h3>
+  <p>Toda etiqueta de cable en el ODF sigue el criterio <b>origen / destino</b>. La barra separa los dos extremos del mismo cable. Lo que va antes de la barra es el punto donde está pegada la etiqueta; lo que va después es a dónde llega el otro extremo.</p>
+  <pre class="flow"><b>[EQUIPO].[PUERTO]</b>  /  <i>[EQUIPO_DESTINO].[PUERTO_DESTINO]</i>
+
+Extremo en el switch:   <b>SW210.7</b> / <i>CK231.LAN.IN</i>
+Extremo en el reloj:    <b>CK231.LAN.IN</b> / <i>SW210.7</i>
+
+El mismo cable, rotulado dos veces, invirtiendo el orden.</pre>
+  <div class="note">
+    <b>La regla de oro</b>
+    Si leés la etiqueta parado frente a un equipo, lo primero que aparece es <em>ese</em> equipo. Nunca al revés. Es lo que permite al instalador saber qué tiene en la mano sin abrir el plano.
+  </div>
+</section>
+
+<!-- ═══════════ EQUIPOS ═══════════ -->
+<section id="s-equipos">
+  <h2>Equipos</h2>
+  <p class="lede">Cinco tipos de equipo activo viven dentro del ODF. Cada uno tiene un nombre fijo por norma: prefijo, número, y el código de estación.</p>
+
+  <pre class="flow"><b>[TIPO][NÚMERO]</b>Es<i>[ESTACIÓN]</i>
+
+<b>SW211</b>Es<i>xxxx</i>   →  Switch 3U con IP terminada en .211
+<b>FW240</b>Es<i>xxxx</i>   →  Firewall de la estación
+<b>CK231</b>Es<i>32</i>     →  Reloj GPS de la estación 32</pre>
+
+  <div class="cards" id="eqcards"></div>
+
+  <h3><span class="n">02</span>Por qué los switches 3U tienen esos números</h3>
+  <p>El número del switch <b>no es arbitrario</b>: es el último octeto de su dirección IP en la red de la subestación. Por eso <code>SW211</code> tiene IP <code>x.x.x.211</code>. Y por eso el rango dice de qué lado del bastidor está.</p>
+  <table>
+    <thead><tr><th class="mono">Rango IP</th><th>Lado</th><th>Ejemplos reales en los proyectos</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">.211 – .219</td><td>Lado A</td><td class="dim">SW211, SW212, SW214, SW219</td></tr>
+      <tr><td class="mono">.221 – .230</td><td>Lado B</td><td class="dim">SW221, SW223, SW229, SW230</td></tr>
+    </tbody>
+  </table>
+  <p>Un bastidor típico de un solo piso trae <code>SW211</code> (lado A, izquierda en vista frontal) y <code>SW221</code> (lado B, derecha). Vistos desde atrás izquierda y derecha se invierten.</p>
+
+  <div class="note alert">
+    <b>Errata frecuente en la documentación</b>
+    Algunas especificaciones dan como ejemplo del Switch Central <code>SW240Esxxxx</code>, pero el formato base correcto es <code>SW210Esxxxx</code>. En los planos reales el Switch Central siempre aparece como <b>SW210</b>. El 240 corresponde al Firewall, no al switch central.
+  </div>
+</section>
+
+<!-- ═══════════ CABLES ═══════════ -->
+<section id="s-cables">
+  <h2>Cables y patchcords</h2>
+  <p class="lede">Tres familias de cable, tres reglas de rotulado. Todas comparten el mismo criterio origen/destino.</p>
+
+  <h3><span class="n">03</span>Cables de alimentación</h3>
+  <p>Llevan energía del distribuidor al equipo. Se rotulan en <b>ambos extremos</b> con el nombre del equipo y la tensión, separados por punto.</p>
+  <table>
+    <thead><tr><th class="mono">Extremo en el equipo</th><th class="mono">Extremo en el distribuidor</th><th>Qué alimenta</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">FW240.+12VCC</td><td class="mono b">+12Vcc/FW240.+12VCC</td><td class="dim">Positivo del firewall</td></tr>
+      <tr><td class="mono">FW240.-12VCC</td><td class="mono b">-12Vcc/FW240.-12VCC</td><td class="dim">Negativo del firewall</td></tr>
+      <tr><td class="mono g">FW240.GND</td><td class="mono g">GND/FW240.GND</td><td class="dim">Tierra del firewall</td></tr>
+      <tr><td class="mono">SW211.+24VCC</td><td class="mono b">+24Vcc/SW211.+24VCC</td><td class="dim">Positivo del switch 3U</td></tr>
+      <tr><td class="mono">SW211.-24VCC</td><td class="mono b">-24Vcc/SW211.-24VCC</td><td class="dim">Negativo del switch 3U</td></tr>
+      <tr><td class="mono g">SW211.GND</td><td class="mono g">GND/SW211.GND</td><td class="dim">Tierra del switch 3U</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <b>Único equipo a 12 V</b>
+    El firewall FortiGate Rugged 30D corre a 12 Vcc. Todo lo demás — SW210, los switches 3U, el reloj — va a 24 Vcc. Es el error más fácil de cometer al copiar un plano de otra estación.
+  </div>
+
+  <h3><span class="n">04</span>Patchcords UTP (cobre, entre equipos activos)</h3>
+  <p>Indican <b>equipo y puerto</b> en cada punta.</p>
+  <pre class="flow">Extremo en el Switch Central:  <b>SW210.1X</b> / <i>FW240.P5</i>
+Extremo en el Firewall:        <b>FW240.P5</b> / <i>SW210.1X</i></pre>
+  <table>
+    <thead><tr><th class="mono">Etiqueta en planos</th><th>Qué une</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">SW210.4 / FW240.LAN3</td><td class="dim">Puerto 4 del switch central → LAN3 del firewall (red interna del ODF)</td></tr>
+      <tr><td class="mono">SW210.7 / CK231.LAN.IN</td><td class="dim">Puerto 7 → entrada LAN del reloj GPS</td></tr>
+      <tr><td class="mono">FW240.LAN4 / SW.TC.P18</td><td class="dim">LAN4 del firewall → puerto 18 del switch del Tablero TC (salida al SCADA)</td></tr>
+      <tr><td class="mono">SW211.P1 / SW214.P2</td><td class="dim">Uplink entre dos switches 3U</td></tr>
+      <tr><td class="mono">CK231.POE.OUT / GPS</td><td class="dim">Salida POE del reloj → antena GPS en el techo</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">05</span>Patchcords de fibra OM2 LC (casete ↔ switch 3U)</h3>
+  <p>Mismo criterio, pero hay que agregar la <b>posición física</b> del conector para poder distinguir las dos fibras de cada canal.</p>
+  <pre class="flow">Lado del casete:  <s>15C04.A1</s> / <b>SW211.F4.SUP</b>
+Lado del switch:  <b>SW211.F4.SUP</b> / <s>15C04.A1</s>
+
+En el switch:  <i>SUP</i> = conector superior   <i>INF</i> = conector inferior
+En el casete:  <s>A1 A2</s> = lado A    <s>R3 R4</s> = reserva    <s>B5 B6</s> = lado B</pre>
+  <table>
+    <thead><tr><th class="mono">Posición</th><th>Dónde está</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td class="mono f">A1 / A2</td><td class="dim">Fila superior del casete, lado A</td><td class="dim">Par de fibras del canal A</td></tr>
+      <tr><td class="mono">R3 / R4</td><td class="dim">Centro del casete</td><td class="dim">Reserva — no se conecta</td></tr>
+      <tr><td class="mono f">B5 / B6</td><td class="dim">Fila inferior del casete, lado B</td><td class="dim">Par de fibras del canal B</td></tr>
+      <tr><td class="mono b">SUP</td><td class="dim">Conector de arriba del puerto Fxx</td><td class="dim">Una fibra del par dúplex</td></tr>
+      <tr><td class="mono b">INF</td><td class="dim">Conector de abajo del puerto Fxx</td><td class="dim">La otra fibra del par</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">06</span>Jumper de fibra</h3>
+  <p>El jumper que va del casete a la celda lleva simplemente el <b>identificador de la celda</b>, igual que el acrílico del casete. Sin puertos ni lados — no hay ambigüedad posible porque une un solo casete con una sola celda.</p>
+</section>
+
+<!-- ═══════════ CELDAS ═══════════ -->
+<section id="s-celdas">
+  <h2>Celdas y casetes</h2>
+  <p class="lede">Cada casete del ODF corresponde a una celda de media tensión del campo. Su identificador es tensión + número de celda.</p>
+
+  <pre class="flow">Acrílico físico del casete:   <s>30/C01</s>     ← con barra
+Etiqueta en patchcord:        <s>30C01</s>.A1   ← sin barra
+
+<s>30/C01</s>  →  Celda 01 de 30 kV
+<s>15/C04</s>  →  Celda 04 de 15 kV
+<s>10/C04</s>  →  Celda 04 de 10 kV</pre>
+
+  <div class="note alert">
+    <b>Conflicto abierto — consultar con Agustin</b>
+    Algunos planos nombran los cables de fibra como <code>15.04</code>, con punto. La norma de etiquetado dice que el casete se etiqueta <code>15/C04</code> y el patchcord <code>15C04</code>. Las dos formas conviven en distintos sets de planos. Antes de rehacer una hoja de bastidor conviene confirmar cuál rige en ese proyecto puntual.
+  </div>
+
+  <h3><span class="n">07</span>Cómo cablea un casete a un switch</h3>
+  <p>Un casete agrupa varias celdas. Cada celda usa un puerto <code>Fxx</code> del switch 3U, y cada puerto son dos fibras: SUP e INF.</p>
+  <table>
+    <thead><tr><th class="mono">Etiqueta completa</th><th>Lectura</th></tr></thead>
+    <tbody>
+      <tr><td class="mono f">15C04.A1 / SW211.F4.INF</td><td class="dim">Primera fibra de la celda 15.04, lado A posición 1 → puerto F4 inferior del SW211</td></tr>
+      <tr><td class="mono f">15C04.A2 / SW211.F4.SUP</td><td class="dim">Segunda fibra de la misma celda → puerto F4 superior del mismo switch</td></tr>
+      <tr><td class="mono f">15C03.B5 / SW221.F3.INF</td><td class="dim">Celda 15.03 lado B → puerto F3 inferior del SW221 (el switch del lado B)</td></tr>
+      <tr><td class="mono f">15C03.B6 / SW221.F3.SUP</td><td class="dim">Segunda fibra del mismo canal B</td></tr>
+    </tbody>
+  </table>
+  <p>Los switches 3U tienen <b>8 puertos de fibra</b> (F1 a F8), o sea 8 celdas por switch. Si la estación tiene más celdas, se agrega otro switch 3U y se le da la IP siguiente.</p>
+</section>
+
+<!-- ═══════════ ENERGÍA ═══════════ -->
+<section id="s-energia">
+  <h2>Sistema de energía</h2>
+  <p class="lede">Desde la red de la subestación hasta los bornes de cada equipo. Dos sistemas en paralelo: alterna para alimentar los conversores, continua para alimentar todo lo demás.</p>
+
+  <pre class="flow"><i>RED DE LA SUBESTACIÓN</i>  220 Vac  /  110 Vdc
+       │
+       ▼
+<i>PANEL SS.AA.AC  ·  SS.AA.CC</i>          externos al ODF
+       │
+       ▼
+<b>BREAKER Q220</b>  40A                    protege la alterna del tablero
+       │
+       ▼
+<b>CONVERSOR C24</b>  110/24V               ← acá nace la corriente continua
+       │
+       ▼
+<b>BREAKER Q24</b>  10A                     protege el bus de continua
+       │
+       ▼
+<u>BUS  +24VCC · -24VCC · GND</u>           bornera central del ODF
+       │
+       ├──▶ <b>SW210</b>   switch central, hub de toda la red
+       ├──▶ <b>SW211</b>   switch 3U lado A  ──▶ <s>celdas por fibra</s>
+       ├──▶ <b>SW221</b>   switch 3U lado B  ──▶ <s>celdas por fibra</s>
+       ├──▶ <b>CK231</b>   reloj GPS         ──▶ antena en el techo (POE)
+       └──▶ <b>FW240</b>   firewall  <i>(12 Vcc)</i> ──▶ Tablero TC ──▶ <i>SCADA</i></pre>
+
+  <h3><span class="n">08</span>Buses del distribuidor</h3>
+  <table>
+    <thead><tr><th class="mono">Bus</th><th>Qué alimenta</th><th>Acrílico</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">220VAC / 230Vac</td><td class="dim">Conversor C24 y el PDU</td><td class="mono">230Vac</td></tr>
+      <tr><td class="mono">+24VCC</td><td class="dim">SW210, SW211, SW221, CK231 y todos los switches 3U</td><td class="mono">+24VCC</td></tr>
+      <tr><td class="mono b">-24VCC</td><td class="dim">Retorno de todos los equipos a 24 V</td><td class="mono">- 24VCC</td></tr>
+      <tr><td class="mono">+12VCC</td><td class="dim">Solo el firewall FW240</td><td class="mono">+12VCC</td></tr>
+      <tr><td class="mono b">-12VCC</td><td class="dim">Retorno del firewall</td><td class="mono">- 12VCC</td></tr>
+      <tr><td class="mono g">GND</td><td class="dim">Tierra de todos los equipos</td><td class="mono">GND</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">09</span>Protecciones</h3>
+  <table>
+    <thead><tr><th class="mono">Breaker</th><th>Protege</th><th>Aparece en</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Q220</td><td class="dim">Entrada de alterna 220 Vac al tablero — 40 A</td><td class="dim">Hoja de auxiliares</td></tr>
+      <tr><td class="mono">Q24</td><td class="dim">Bus de continua 24 Vcc — 10 A</td><td class="dim">Hoja de cableado</td></tr>
+      <tr><td class="mono">QA24</td><td class="dim">Entrada del conversor A</td><td class="dim">Bifilar CC</td></tr>
+      <tr><td class="mono">QB24</td><td class="dim">Entrada del conversor B (solo si hay redundancia)</td><td class="dim">Bifilar CC — configuración redundante</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="n">10</span>La señal TL.CC.ALO</h3>
+  <p>No es fibra ni Ethernet: es un circuito de <b>telealimentación de corriente continua</b> que sale del ODF hacia el campo.</p>
+  <pre class="flow"><b>TL</b>   Telealimentación
+<b>CC</b>   Corriente Continua
+<b>ALO</b>  nombre del circuito de alimentación local
+<b>FA24</b> Feed A, 24 Vcc
+<b>FB24</b> Feed B, 24 Vcc — solo donde hay conversor redundante</pre>
+  <p>Es fácil que estos cables terminen con una referencia cruzada rota (por ejemplo <code>H7:B2</code>) cuando se adapta un plano maestro más grande a un set más chico: la hoja referenciada puede no existir o no contener ese circuito en el set nuevo. Hay que verificarlo siempre.</p>
+</section>
+
+<!-- ═══════════ ESTACIONES ═══════════ -->
+<section id="s-estaciones">
+  <h2>Configuraciones típicas</h2>
+  <p class="lede">Un mismo diseño de ODF se adapta a estaciones distintas. Conocer qué suele variar evita arrastrar errores al reutilizar un plano de otra estación como base.</p>
+
+  <table>
+    <thead><tr><th>Característica</th><th class="mono">Configuración simple</th><th class="mono">Configuración redundante</th></tr></thead>
+    <tbody>
+      <tr><td class="dim">Tensión de campo</td><td class="mono">una sola (p. ej. 10 kV)</td><td class="mono">puede combinar niveles (p. ej. 15 kV)</td></tr>
+      <tr><td class="dim">Conversores CC</td><td class="mono">1 × C24</td><td class="mono">2 × C24A + C24B</td></tr>
+      <tr><td class="dim">Breakers CC</td><td class="mono">QA24</td><td class="mono">QA24 + QB24</td></tr>
+      <tr><td class="dim">Switches 3U</td><td class="mono">2 (uno por lado)</td><td class="mono">varios pares, según cantidad de celdas</td></tr>
+      <tr><td class="dim">Bastidores</td><td class="mono">1 (ODF de pared)</td><td class="mono">varios (ODF de piso)</td></tr>
+      <tr><td class="dim">Telealimentación</td><td class="mono">FA24</td><td class="mono">FA24 + FB24</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>De dónde vienen los errores</b>
+    Cuando se adapta un plano maestro más grande y redundante a una estación más chica y simple, suelen sobrar hojas, sobrar conversores y sobrar referencias cruzadas que apuntan a hojas que ya no están en el set nuevo. Conviene barrer todo eso antes de dar el plano por terminado.
+  </div>
+
+  <h3><span class="n">11</span>ODF de piso vs ODF de pared</h3>
+  <p>En el <b>ODF de piso</b> los bastidores van apilados en pisos horizontales. En el <b>ODF de pared</b> —un gabinete típico de 600×300×1400— los bastidores van en vertical. La diferencia importa porque cambia cómo se dibujan las vistas frontal y posterior.</p>
+  <p>Un ODF de pared con un <b>único bastidor</b> suele traer un solo par de switches (211 y 221). Visto de atrás la disposición se espeja: el que estaba a la derecha en vista frontal pasa a la izquierda.</p>
+</section>
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<section id="s-quiz">
+  <h2>Práctica</h2>
+  <p class="lede">Doce preguntas sobre lo que más se equivoca al dibujar estos planos. Sin trampa: si fallás, te dice por qué.</p>
+
+  <div class="quizbar">
+    <span>Progreso <strong id="qprog">0 / 12</strong></span>
+    <span>Correctas <strong id="qscore">0</strong></span>
+  </div>
+  <div id="qzone"></div>
+</section>
+
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>

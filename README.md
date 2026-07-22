@@ -1,77 +1,52 @@
-# ODF — Manual Interactivo de Diseño y Etiquetado
+# ODF Manual Interactivo
 
-> Manual técnico interactivo para documentación de Tableros ODF en subestaciones eléctricas.
+> Guía web interactiva para apoyar la documentación, el diseño y el etiquetado de tableros ODF (*Optical Distribution Frame*) en subestaciones eléctricas.
 
-**🔗 Ver en vivo:** [https://juliogb01.github.io/ODF_Manual_Interactivo](https://juliogb01.github.io/ODF_Manual_Interactivo)
+[Ver el sitio](https://juliogb01.github.io/ODF_Manual_Interactivo/)
 
----
+El manual reúne criterios de nomenclatura, equipos, cables, patchcords, celdas, casetes, alimentación y configuraciones típicas. Incluye un decodificador de etiquetas y una práctica breve para reforzar la revisión documental.
 
-## ¿Qué es esto?
+## Contenido
 
-Una referencia técnica en formato web para quienes dibujan planos *as-built* de Tableros ODF (Optical Distribution Frame) en subestaciones de alta y media tensión.
-
-Cubre los tres pilares del trabajo:
-
-| Sección | Contenido |
-|---|---|
-| **Decodificador de etiquetas** | Pegás cualquier rótulo de un plano y el sistema lo descompone en sus partes, verificando si cumple la norma |
-| **Equipos** | SW210, SW211/SW221, FW240, CK231, C24 — nomenclatura, función y tensión de operación |
-| **Cables y patchcords** | Alimentación, UTP cobre y fibra OM2 LC con criterio origen/destino |
-| **Celdas y casetes** | Identificadores de celda, diferencia entre acrílico y etiqueta de patchcord |
-| **Sistema de energía** | Camino completo desde la red de la subestación hasta los bornes de cada equipo |
-| **Configuraciones típicas** | Simple vs redundante, ODF de pared vs de piso |
-| **Práctica (Quiz)** | 12 preguntas sobre los errores más comunes en revisión |
-
----
-
-## Estructura del proyecto
-
-```
-ODF_Manual_Interactivo/
-├── index.html                  ← Punto de entrada (GitHub Pages)
-├── style.css                   ← Estilos visuales
-├── script.js                   ← Lógica interactiva (decodificador + quiz)
-├── ODF_Manual_Interactivo.html ← Archivo monolítico original (referencia)
-└── README.md                   ← Este archivo
-```
-
----
+- Decodificador de etiquetas con validación de formato.
+- Referencias de equipos y tensiones de operación.
+- Criterios para cables de alimentación, UTP y fibra.
+- Orientación sobre celdas, casetes y patchcords.
+- Recorrido del sistema de energía.
+- Comparación de configuraciones simples y redundantes.
+- Quiz de revisión con errores frecuentes.
 
 ## Uso local
 
-No requiere servidor ni dependencias. Abrí `index.html` directamente en el navegador:
+No requiere instalación ni dependencias. Clona el repositorio y abre `index.html`:
 
-```bash
-# Clonar el repositorio
+```powershell
 git clone https://github.com/JulioGB01/ODF_Manual_Interactivo.git
-
-# Abrir en el navegador
-start index.html   # Windows
-open index.html    # macOS
+cd ODF_Manual_Interactivo
+start index.html
 ```
 
----
+## Estructura
 
-## Tecnologías
+```text
+.
+├── index.html                    # Punto de entrada para GitHub Pages
+├── style.css                     # Estilos de la interfaz
+├── script.js                     # Decodificador, quiz y comportamiento
+├── ODF_Manual_Interactivo.html   # Versión monolítica de referencia
+└── .github/workflows/static.yml  # Despliegue estático
+```
 
-- HTML5 semántico
-- CSS3 con variables custom (sin frameworks)
-- JavaScript vanilla (sin dependencias)
-- Tipografías: [Barlow Condensed](https://fonts.google.com/specimen/Barlow+Condensed), [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono), [Inter](https://fonts.google.com/specimen/Inter) vía Google Fonts
+## Publicación
 
----
+El workflow incluido despliega la rama `main` en GitHub Pages. Activa **Settings → Pages → GitHub Actions** para publicar la versión actual.
 
-## Despliegue en GitHub Pages
+## Alcance y uso responsable
 
-El sitio se publica automáticamente desde la rama `main`. Para activarlo:
+Este repositorio es una referencia técnica educativa. No sustituye las especificaciones del proyecto, normas aplicables, planos aprobados, procedimientos de seguridad ni la revisión de un profesional competente.
 
-1. Ir a **Settings → Pages** del repositorio
-2. En *Source* seleccionar **Deploy from a branch**
-3. Seleccionar rama `main` y carpeta `/ (root)`
-4. Guardar — en pocos minutos el sitio estará disponible
+No publiques en este repositorio información operacional o confidencial: diagramas de red reales, credenciales, direcciones IP, nombres de clientes, ubicaciones de infraestructura, fotografías sensibles o detalles de seguridad física. Verifica siempre el contenido contra la documentación vigente del proyecto antes de aplicarlo en campo.
 
----
+## Contribuciones
 
-## Licencia
-
-Documentación técnica interna. Todos los derechos reservados.
+Consulta [`CONTRIBUTING.md`](CONTRIBUTING.md) antes de proponer cambios.
